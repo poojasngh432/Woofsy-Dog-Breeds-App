@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white"
+    tools:context=".activity.GifActivity">
+
+    <TextView
+        android:id="@+id/breed_name_tv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:fontFamily="serif"
+        android:textColor="@android:color/white"
+        android:text="FURRY FRIENDS IN GIFS"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:gravity="center_horizontal"
+        android:layout_marginTop="15dp"
+        android:layout_alignParentTop="true"
+        android:background="@color/dark_pink"
+        android:padding="15dp"
+        android:textAllCaps="true"/>
+
+    <ImageView
+        android:id="@+id/iv_dog_img"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="fitCenter"
+        tools:srcCompat="@drawable/ic_dog"
+        android:layout_below="@+id/breed_name_tv"
+        android:layout_above="@+id/actions_ll"
+        android:foregroundGravity="center"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:layout_centerInParent="true"/>
+
+    <ProgressBar
+        android:id="@+id/progress_load_photo"
+        style="@android:style/Widget.ProgressBar.Small"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/actions_ll"
+        android:layout_above="@+id/btn_random"
+        android:padding="15dp"
+        android:orientation="horizontal"
+        android:weightSum="6"
+        android:background="@color/colorPrimaryDark">
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="30dp"
+            android:id="@+id/iv_share"
+            android:layout_weight="1"
+            android:src="@drawable/ic_share_white"/>
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="30dp"
+            android:id="@+id/iv_download"
+            android:layout_weight="1"
+            android:src="@drawable/ic_download_white"/>
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="30dp"
+            android:id="@+id/iv_like"
+            android:layout_weight="1"
+            android:src="@drawable/ic_unlike_red"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Source: Giphy "
+            android:textColor="@color/white"
+            android:layout_weight="3"
+            android:gravity="end"
+            android:layout_marginRight="10dp"
+            android:textSize="15sp"/>
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/btn_random"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp"
+        android:textAllCaps="true"
+        android:background="@color/green"
+        android:textColor="@color/white"
+        android:layout_alignParentBottom="true"
+        android:text="Get Random Gif"/>
+</RelativeLayout>

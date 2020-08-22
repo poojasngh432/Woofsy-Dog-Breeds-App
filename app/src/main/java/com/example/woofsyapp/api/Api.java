@@ -1,25 +1,34 @@
 package com.example.woofsyapp.api;
 
 import com.example.woofsyapp.model.AllBreedsModel;
-
-import java.util.List;
+import com.example.woofsyapp.model.Datum;
+import com.example.woofsyapp.model.RandomDogModel;
+import com.example.woofsyapp.model.RandomGifResponse;
 
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 public interface Api {
 
     String BASE_URL = "https://dog.ceo/api/";    //Root url
+    String BASE_URL_GIPHY = "https://api.giphy.com/v1/gifs/";
 
-  //  String KEY = "wYx2JTqJKfZ_qzUI5kAf5iLzSBVQm0XiLoZUPRQBgicUajwxlvQHCTYkqYKL91SdZP3YSkiJX09K1tCGG-eKrW7ZklZ9Uspkm5_BxDlH2jW0nuo2oDemN9CCS2h10ox_1xSncGQajx_ryfhECjZEnKXFvsR88vL4WiBr168omFadgngDnj25DLpEvLRaiIpzZr1NvbW-Bo38vshdDBv10tpytj_A4aoE&lib=Mm1FD1HVuydJN5yAB3dc_e8h00DPSBbB3";
-  //  String NEWS_API_KEY = "69461f79c446489e8df57822f2c8f0dd";
+    //Full url gif = https://api.giphy.com/v1/gifs/search?q=dog&limit=1
 
     @GET("breeds/list")
     Call<AllBreedsModel> getAllBreedsList();
 
+    @GET("breeds/image/random")
+    Call<RandomDogModel> getRandomDog();
+
     @GET("breed/{type}/images")
     Call<AllBreedsModel> getAllImagesOfBreed(@Path("type") String breedType);
+
+    @GET("search?q=dog&limit=1")
+    Call<RandomGifResponse> getRandomGif(@Query("offset") int offset, @Query("api_key") String api_key);
+
 
 //    @GET("countries")
 //    Call<List<Countries>> getCountriesData();

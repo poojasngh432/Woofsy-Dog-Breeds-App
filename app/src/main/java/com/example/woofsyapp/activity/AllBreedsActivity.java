@@ -72,8 +72,6 @@ public class AllBreedsActivity extends AppCompatActivity {
                 // Make sure you call swipeContainer.setRefreshing(false)
                 // once the network request has completed successfully.
                 callApi();
-              //  adapter.clear();
-              //  adapter.addAll(allBreedsData);
                 // Now we call setRefreshing(false) to signal refresh has finished
                 swipeContainer.setRefreshing(false);
             }
@@ -134,7 +132,6 @@ public class AllBreedsActivity extends AppCompatActivity {
             recyclerView.setLayoutManager(layoutManager);
             recyclerView.setItemAnimator(new DefaultItemAnimator());
             recyclerView.setNestedScrollingEnabled(false);
-          //  adapter = new AllBreedsAdapter(allBreedsData, mContext);
             recyclerView.setAdapter(adapter);
             adapter.notifyDataSetChanged();
             initListener();
@@ -146,19 +143,12 @@ public class AllBreedsActivity extends AppCompatActivity {
         adapter.setOnItemClickListener(new AllBreedsAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-               // ImageView imageView = view.findViewById(R.id.img);
                 intent2 = new Intent(AllBreedsActivity.this, BreedDetailActivity.class);
                 intent2.putExtra("breedType", allBreedsData.get(position));
                 selectedBreed = allBreedsData.get(position);
-//                intent.putExtra("title", article.getTitle());
-//                intent.putExtra("img",  article.getUrlToImage());
-//                intent.putExtra("date",  article.getPublishedAt());
-//                intent.putExtra("source",  article.getSource().getName());
-//                intent.putExtra("author",  article.getAuthor());
                 flag = 0;
                 callApi2();
                 setImagesList();
-           //     dismissLoadingDialog();
 
             }
         });
@@ -181,7 +171,6 @@ public class AllBreedsActivity extends AppCompatActivity {
             public void onResponse(Call<AllBreedsModel> call, Response<AllBreedsModel> response) {
                 if (response.isSuccessful() && response.body().getMessage() != null) {
                     imagesList = response.body().getMessage();
-                 //   setRecyclerView();
                     if(flag == 0){
                         startActivity(intent2);
                     }

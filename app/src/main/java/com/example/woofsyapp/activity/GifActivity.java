@@ -3,23 +3,20 @@ package com.example.woofsyapp.activity;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.app.DownloadManager;
+import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
-import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -33,72 +30,59 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.Target;
 import com.example.woofsyapp.R;
+import com.example.woofsyapp.api.Api;
+import com.example.woofsyapp.model.Datum;
+import com.example.woofsyapp.model.RandomGifResponse;
 import com.example.woofsyapp.util.Utils;
 
-import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 import static android.bluetooth.BluetoothGattCharacteristic.PERMISSION_WRITE;
 
-public class DogActivity extends AppCompatActivity {
-    private String imageAddress, breedType;
-    private ImageView IVDog, IVShare, IVDownload, IVLike;
+public class GifActivity extends AppCompatActivity {
+
+    private ImageView ivDog;
     private Context mContext;
     private ProgressBar progressBar;
+    private List<String> breedsList;
+    private Button btnRandom;
+    private ProgressDialog progressDialog;
+    public String randomDogImg;
+    private int flag = 0;
+    private ImageView IVShare, IVDownload, IVLike;
     private int flagLike = 0;
+    private RandomGifResponse dataModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_dog);
-        mContext = DogActivity.this;
-
-        IVDog = findViewById(R.id.dog_imageview);
+        setContentView(R.layout.activity_gif);
+        ivDog = findViewById(R.id.iv_dog_img);
         progressBar = findViewById(R.id.progress_load_photo);
+        btnRandom = findViewById(R.id.btn_random);
         IVShare = findViewById(R.id.iv_share);
         IVDownload = findViewById(R.id.iv_download);
         IVLike = findViewById(R.id.iv_like);
 
-        Intent intent = getIntent();
-        imageAddress = intent.getStringExtra("imageAddress");
-        breedType = intent.getStringExtra("breedType");
+        mContext = GifActivity.this;
+        breedsList = new LinkedList<>();
 
-        RequestOptions requestOptions = new RequestOptions();
-        requestOptions.placeholder(Utils.getRandomDrawbleColor());
-        requestOptions.error(Utils.getRandomDrawbleColor());
-        requestOptions.diskCacheStrategy(DiskCacheStrategy.ALL);
-        requestOptions.fitCenter();
+        getSupportActionBar().setTitle("Gifs");
 
-        Glide.with(mContext)
-                .load(imageAddress)
-                .apply(requestOptions)
-                .listener(new RequestListener<Drawable>() {
-                    @Override
-                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
-                        progressBar.setVisibility(View.GONE);
-                        return false;
-                    }
+        IVLike.setImageDrawable(getResources().getDrawable(R.drawable.ic_unlike_red));
 
-                    @Override
-                    public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
-                        progressBar.setVisibility(View.GONE);
-                        return false;
-                    }
-                })
-                .transition(DrawableTransitionOptions.withCrossFade())
-                .into(IVDog);
+        callApi2();
 
         IVShare.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -110,7 +94,7 @@ public class DogActivity extends AppCompatActivity {
         IVDownload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                DownloadImage(imageAddress);
+                DownloadImage(randomDogImg);  //CHANGE THE DOWNLOAD FEATURE FOR GIF
             }
         });
 
@@ -122,10 +106,12 @@ public class DogActivity extends AppCompatActivity {
                     IVLike.setImageDrawable(getResources().getDrawable(R.drawable.ic_like));
                 }
                 else{
-                    IVLike.setImageDrawable(getResources().getDrawable(R.drawable.ic_unlike));
+                    IVLike.setImageDrawable(getResources().getDrawable(R.drawable.ic_unlike_red));
                 }
 
-               List<String> list = new MainActivity().updateLikedImages(imageAddress);
+                List<String> list = new MainActivity().updateLikedImages(randomDogImg);
+                new MainActivity().setImagesList(list);
+
                 StringBuilder str = new StringBuilder();
                 for(String s: list){
                     str.append(s);
@@ -136,6 +122,16 @@ public class DogActivity extends AppCompatActivity {
 
             }
         });
+
+        btnRandom.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                IVLike.setImageDrawable(getResources().getDrawable(R.drawable.ic_unlike_red));
+                flagLike = 0;
+                callApi2();
+            }
+        });
+
     }
 
     private void shareImage() {
@@ -147,7 +143,7 @@ public class DogActivity extends AppCompatActivity {
         if (checkPermission()){
             showToast("Downloading Image...");
             //Asynctask to create a thread to downlaod image in the background
-            new DownloadImage().execute(imageAddress);
+            new DownloadImage().execute(randomDogImg);
         } else {
             showToast("Need Permission to access storage for Downloading Image");
         }
@@ -176,7 +172,7 @@ public class DogActivity extends AppCompatActivity {
             }
 
             if(permissionsMap.containsKey(Manifest.permission.WRITE_EXTERNAL_STORAGE) && permissionsMap.get(Manifest.permission.WRITE_EXTERNAL_STORAGE) == 0) {
-                new DownloadImage().execute(imageAddress);
+                new DownloadImage().execute(randomDogImg);
             }
         }
     }
@@ -205,7 +201,7 @@ public class DogActivity extends AppCompatActivity {
             request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI | DownloadManager.Request.NETWORK_MOBILE)
                     .setAllowedOverRoaming(false).setTitle("Demo")
                     .setDescription("Something useful. No, really.")
-                    .setDestinationInExternalPublicDir("/Woofsy", breedType + ".jpg");
+                    .setDestinationInExternalPublicDir("/Woofsy", "dog.jpg");
 
             mgr.enqueue(request);
 
@@ -220,6 +216,89 @@ public class DogActivity extends AppCompatActivity {
     }
 
     void showToast(String msg){
-        Toast.makeText(DogActivity.this,msg,Toast.LENGTH_SHORT).show();
+        Toast.makeText(GifActivity.this,msg,Toast.LENGTH_SHORT).show();
+    }
+
+    private void callApi2() {
+        showLoadingDialog();
+
+        Random random = new Random();
+        int offset = random.nextInt(4000);
+        String api_key = "fH0BpGnLRdA12yZYn2zETY4Ka4IBoeXz";
+
+        //Creating a retrofit object
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(Api.BASE_URL_GIPHY)
+                .addConverterFactory(GsonConverterFactory.create())  //Here we are using the GsonConverterFactory to directly convert json data to object
+                .build();
+
+        //creating the api interface
+        Api api = retrofit.create(Api.class);
+        Call<RandomGifResponse> call = api.getRandomGif(offset,api_key);
+
+        call.enqueue(new Callback<RandomGifResponse>() {
+            @Override
+            public void onResponse(Call<RandomGifResponse> call, Response<RandomGifResponse> response) {
+                dismissLoadingDialog();
+                if (response.isSuccessful() && response.body() != null) {
+                    dataModel = response.body();
+                    randomDogImg = dataModel.getData().get(0).getImages().getOriginal().getUrl();
+
+                    changeImage(randomDogImg);
+
+                }
+            }
+
+            @Override
+            public void onFailure(Call<RandomGifResponse> call, Throwable t) {
+                dismissLoadingDialog();
+                Toast.makeText(mContext, t.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    private void changeImage(String randomDogImg) {
+        RequestOptions requestOptions = new RequestOptions();
+        requestOptions.placeholder(Utils.getRandomDrawbleColor());
+        requestOptions.error(Utils.getRandomDrawbleColor());
+        requestOptions.diskCacheStrategy(DiskCacheStrategy.ALL);
+        requestOptions.fitCenter();
+
+        Glide.with(mContext)
+                .load(randomDogImg)
+                .apply(requestOptions)
+                .listener(new RequestListener<Drawable>() {
+                    @Override
+                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                        progressBar.setVisibility(View.GONE);
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                        progressBar.setVisibility(View.GONE);
+                        return false;
+                    }
+                })
+                .transition(DrawableTransitionOptions.withCrossFade())
+                .into(ivDog);
+    }
+
+    private void showLoadingDialog() {
+        progressDialog = ProgressDialog.show(mContext, null, this.getString(R.string.loading), false, false);
+    }
+
+    private void dismissLoadingDialog() {
+        try {
+            if (progressDialog.isShowing()) {
+                progressDialog.dismiss();
+            }
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            progressDialog = null;
+        }
     }
 }

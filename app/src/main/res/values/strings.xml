@@ -1,10 +1,11 @@
 <resources>
     <string name="app_name">WoofsyApp</string>
     <string name="loading">Loading..</string>
+    <string name="correct">Correct</string>
+    <string name="incorrect">Incorrect</string>
 
     <string-array name="navigation_drawer_items_array">
-        <item>Photos</item>
-        <item>Gifs</item>
+        <item>Likes</item>
         <item>About</item>
     </string-array>
 

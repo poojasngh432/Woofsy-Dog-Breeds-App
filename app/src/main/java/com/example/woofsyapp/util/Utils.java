@@ -2,6 +2,8 @@ package com.example.woofsyapp.util;
 
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+
+import java.util.List;
 import java.util.Random;
 
 public class Utils {
@@ -20,6 +22,11 @@ public class Utils {
     public static ColorDrawable getRandomDrawbleColor() {
         int idx = new Random().nextInt(vibrantLightColorList.length);
         return vibrantLightColorList[idx];
+    }
+
+    public static String generateRandomString(List<String> list){
+        Random rand = new Random();
+        return list.get(rand.nextInt(list.size()));
     }
 
 }

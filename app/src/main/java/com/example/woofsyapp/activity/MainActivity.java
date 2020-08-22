@@ -30,7 +30,10 @@ import com.example.woofsyapp.api.Api;
 import com.example.woofsyapp.fragment.ConnectFragment;
 import com.example.woofsyapp.model.AllBreedsModel;
 import com.example.woofsyapp.model.DataModel;
+import com.example.woofsyapp.model.RandomDogModel;
 
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 import retrofit2.Call;
@@ -53,6 +56,8 @@ public class MainActivity extends AppCompatActivity {
     private Context mContext;
     public static List<String> allBreedsData;
     public AllBreedsModel breedsData;
+    public static List<String> likedImages = new LinkedList<>();
+    public static String randomDog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,13 +70,15 @@ public class MainActivity extends AppCompatActivity {
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerList = (ListView) findViewById(R.id.left_drawer);
 
+      //  getSupportActionBar().setTitle("Woofsy");
+
         setupToolbar();
 
-        DataModel[] drawerItem = new DataModel[3];
+        DataModel[] drawerItem = new DataModel[2];
 
-        drawerItem[0] = new DataModel(R.drawable.ic_favorite, "Photos");
-        drawerItem[1] = new DataModel(R.drawable.ic_favorite, "Gifs");
-        drawerItem[2] = new DataModel(R.drawable.ic_favorite, "About");
+        drawerItem[0] = new DataModel(R.drawable.ic_favorite, "Liked Photos");
+       // drawerItem[1] = new DataModel(R.drawable.ic_favorite, "Gifs");
+        drawerItem[1] = new DataModel(R.drawable.ic_info, "About");
         getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         getSupportActionBar().setHomeButtonEnabled(true);
 
@@ -81,6 +88,8 @@ public class MainActivity extends AppCompatActivity {
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerLayout.setDrawerListener(mDrawerToggle);
         setupDrawerToggle();
+
+        callApiForBreeds();
 
         IV1 = findViewById(R.id.iv_1);
         IV2 = findViewById(R.id.iv_2);
@@ -96,22 +105,90 @@ public class MainActivity extends AppCompatActivity {
         IV2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent i = new Intent(MainActivity.this, AllBreedsActivity.class);
-                startActivity(i);
+                callApi2();
+//                Intent i = new Intent(MainActivity.this, GuessTheBreedActivity.class);
+//                startActivity(i);
             }
         });
         IV3.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent i = new Intent(MainActivity.this, AllBreedsActivity.class);
+                Intent i = new Intent(MainActivity.this, ShakeThePawActivity.class);
                 startActivity(i);
             }
         });
         IV4.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent i = new Intent(MainActivity.this, AllBreedsActivity.class);
+                Intent i = new Intent(MainActivity.this, GifActivity.class);
                 startActivity(i);
+            }
+        });
+    }
+
+    private void callApiForBreeds() {
+       // showLoadingDialog();
+        //Creating a retrofit object
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(Api.BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())  //Here we are using the GsonConverterFactory to directly convert json data to object
+                .build();
+
+        //creating the api interface
+        Api api = retrofit.create(Api.class);
+        Call<AllBreedsModel> call = api.getAllBreedsList();
+
+        call.enqueue(new Callback<AllBreedsModel>() {
+            @Override
+            public void onResponse(Call<AllBreedsModel> call, Response<AllBreedsModel> response) {
+             //   dismissLoadingDialog();
+                if (response.isSuccessful() && response.body().getMessage() != null) {
+                    allBreedsData = response.body().getMessage();
+                    breedsData = response.body();
+                    setAllBreedsData();
+//                    Intent i = new Intent(MainActivity.this, AllBreedsActivity.class);
+//                    startActivity(i);
+
+                }
+            }
+
+            @Override
+            public void onFailure(Call<AllBreedsModel> call, Throwable t) {
+            //    dismissLoadingDialog();
+                Toast.makeText(mContext, t.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    private void callApi2() {
+        showLoadingDialog();
+        //Creating a retrofit object
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(Api.BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())  //Here we are using the GsonConverterFactory to directly convert json data to object
+                .build();
+
+        //creating the api interface
+        Api api = retrofit.create(Api.class);
+        Call<RandomDogModel> call = api.getRandomDog();
+
+        call.enqueue(new Callback<RandomDogModel>() {
+            @Override
+            public void onResponse(Call<RandomDogModel> call, Response<RandomDogModel> response) {
+                dismissLoadingDialog();
+                if (response.isSuccessful() && response.body() != null) {
+                    randomDog = response.body().getMessage();
+                    getRandomDogImage();
+                    Intent i = new Intent(MainActivity.this, GuessTheBreedActivity.class);
+                    startActivity(i);
+
+                }
+            }
+
+            @Override
+            public void onFailure(Call<RandomDogModel> call, Throwable t) {
+                dismissLoadingDialog();
+                Toast.makeText(mContext, t.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -157,6 +234,9 @@ public class MainActivity extends AppCompatActivity {
         return allBreedsData;
     }
 
+    public static String getRandomDogImage() {
+        return randomDog;
+    }
 
     private class DrawerItemClickListener implements ListView.OnItemClickListener {
 
@@ -173,7 +253,8 @@ public class MainActivity extends AppCompatActivity {
 
         switch (position) {
             case 0:
-                fragment = new ConnectFragment();
+                Intent intent = new Intent(MainActivity.this, LikesActivity.class);
+                startActivity(intent);
                 break;
 //            case 1:
 //                fragment = new FixturesFragment();
@@ -252,4 +333,29 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public List<String> updateLikedImages(String img){
+
+        if(likedImages.contains(img)){
+            likedImages.remove(img);
+        }
+        else{
+            likedImages.add(img);
+        }
+
+        return likedImages;
+    }
+
+    public List<String> getLikedImages(){
+
+        return likedImages;
+    }
+
+    public void setImagesList(List<String> updatedList){
+
+        likedImages = updatedList;
+    }
+
+    void showToast(String msg){
+        Toast.makeText(MainActivity.this,msg,Toast.LENGTH_SHORT).show();
+    }
 }

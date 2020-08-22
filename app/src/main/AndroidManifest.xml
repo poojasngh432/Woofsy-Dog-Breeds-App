@@ -2,22 +2,46 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.woofsyapp">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/ic_dog_main"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activity.DogActivity"></activity>
-        <activity android:name=".activity.BreedDetailActivity"
+        <activity
+            android:name=".activity.LikesActivity"
             android:label="Breed Name"
             android:theme="@style/Theme.AppCompat.DayNight.DarkActionBar"/>
-        <activity android:name=".activity.AllBreedsActivity"
+        <activity
+            android:name=".activity.GifActivity"
+            android:label="Gifs"
+            android:theme="@style/Theme.AppCompat.DayNight.DarkActionBar"/>
+        <activity
+            android:name=".activity.ShakeThePawActivity"
+            android:label="Shake The Paw"
+            android:theme="@style/Theme.AppCompat.DayNight.DarkActionBar"/>
+        <activity
+            android:name=".activity.GuessTheBreedActivity"
+            android:label="Guess The Breed"
+            android:theme="@style/Theme.AppCompat.DayNight.DarkActionBar"/>
+        <activity
+            android:name=".activity.DogActivity"
+            android:theme="@style/Theme.AppCompat.DayNight.DarkActionBar"/>
+        <activity
+            android:name=".activity.BreedDetailActivity"
+            android:theme="@style/Theme.AppCompat.DayNight.DarkActionBar" />
+        <activity
+            android:name=".activity.AllBreedsActivity"
             android:label="List Of All Breeds"
-            android:theme="@style/Theme.AppCompat.DayNight.DarkActionBar">
-        </activity>
-        <activity android:name=".activity.MainActivity">
+            android:theme="@style/Theme.AppCompat.DayNight.DarkActionBar" />
+        <activity
+            android:name=".activity.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -25,7 +49,5 @@
             </intent-filter>
         </activity>
     </application>
-
-    <uses-permission android:name="android.permission.INTERNET" />
 
 </manifest>
