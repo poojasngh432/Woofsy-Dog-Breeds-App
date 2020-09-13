@@ -46,7 +46,7 @@
                 android:layout_height="30dp"
                 android:id="@+id/iv_like"
                 android:layout_weight="1"
-                android:src="@drawable/ic_unlike"/>
+                android:src="@drawable/ic_unlike_red"/>
         </LinearLayout>
 
     </RelativeLayout>

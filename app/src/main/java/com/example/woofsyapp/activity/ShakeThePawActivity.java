@@ -2,23 +2,17 @@ package com.example.woofsyapp.activity;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-
-import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.os.Bundle;
-import android.util.DisplayMetrics;
-import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -31,10 +25,6 @@ import com.example.woofsyapp.R;
 import com.example.woofsyapp.api.Api;
 import com.example.woofsyapp.model.RandomDogModel;
 import com.example.woofsyapp.util.Utils;
-
-import java.util.LinkedList;
-import java.util.List;
-
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -47,73 +37,55 @@ public class ShakeThePawActivity extends AppCompatActivity {
     private ImageView ivDog;
     private Context mContext;
     private ProgressBar progressBar;
-    private List<String> breedsList;
     private Button btnRandom;
     private ProgressDialog progressDialog;
     public String randomDogImg;
     private TextView breedNameTV;
     private String[] strArr;
-    private int flag = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_shake_the_paw);
-        ivDog = findViewById(R.id.iv_dog_img);
-        progressBar = findViewById(R.id.progress_load_photo);
-        btnRandom = findViewById(R.id.btn_random);
-        breedNameTV = findViewById(R.id.breed_name_tv);
-
         mContext = ShakeThePawActivity.this;
-        breedsList = new LinkedList<>();
 
-        randomDogImg = new MainActivity().getRandomDogImage();
-        breedsList = new MainActivity().setAllBreedsData();
+        Intent intent = getIntent();
+        randomDogImg = intent.getStringExtra("dogImage");
+
+        setIds();
 
         if(randomDogImg != null){
+            showLoadingDialog();
             strArr = randomDogImg.split("/");
             correctAnswer = strArr[4];
             breedNameTV.setText(correctAnswer);
-
-            flag = 1;
-
-            RequestOptions requestOptions = new RequestOptions();
-            requestOptions.placeholder(Utils.getRandomDrawbleColor());
-            requestOptions.error(Utils.getRandomDrawbleColor());
-            requestOptions.diskCacheStrategy(DiskCacheStrategy.ALL);
-            requestOptions.fitCenter();
-
-            Glide.with(mContext)
-                    .load(randomDogImg)
-                    .apply(requestOptions)
-                    .listener(new RequestListener<Drawable>() {
-                        @Override
-                        public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
-                            progressBar.setVisibility(View.GONE);
-                            return false;
-                        }
-
-                        @Override
-                        public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
-                            progressBar.setVisibility(View.GONE);
-                            return false;
-                        }
-                    })
-                    .transition(DrawableTransitionOptions.withCrossFade())
-                    .into(ivDog);
-
+            changeImage(randomDogImg);
         }else{
-            callApi2();
+            if (Utils.isNetworkAvailable(mContext)) {
+                callApi2();
+            }else{
+                showToast("Not connected to Internet");
+            }
         }
 
         btnRandom.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                flag = 0;
-                callApi2();
+                if (Utils.isNetworkAvailable(mContext)) {
+                    callApi2();
+                }else{
+                    showToast("Not connected to Internet");
+                }
             }
         });
 
+    }
+
+    private void setIds() {
+        ivDog = findViewById(R.id.iv_dog_img);
+        progressBar = findViewById(R.id.progress_load_photo);
+        btnRandom = findViewById(R.id.btn_random);
+        breedNameTV = findViewById(R.id.breed_name_tv);
     }
 
     private void callApi2() {
@@ -131,16 +103,14 @@ public class ShakeThePawActivity extends AppCompatActivity {
         call.enqueue(new Callback<RandomDogModel>() {
             @Override
             public void onResponse(Call<RandomDogModel> call, Response<RandomDogModel> response) {
-                dismissLoadingDialog();
+              //  dismissLoadingDialog();
                 if (response.isSuccessful() && response.body() != null) {
                     randomDogImg = response.body().getMessage();
                     strArr = randomDogImg.split("/");
                     String breedName = strArr[4];
                     breedNameTV.setText(breedName);
+                    changeImage(randomDogImg);
 
-                    if(flag != 1){
-                        changeImage(randomDogImg);
-                    }
                 }
             }
 
@@ -172,6 +142,7 @@ public class ShakeThePawActivity extends AppCompatActivity {
                     @Override
                     public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
                         progressBar.setVisibility(View.GONE);
+                        dismissLoadingDialog();
                         return false;
                     }
                 })
@@ -195,6 +166,10 @@ public class ShakeThePawActivity extends AppCompatActivity {
         } finally {
             progressDialog = null;
         }
+    }
+
+    void showToast(String msg){
+        Toast.makeText(ShakeThePawActivity.this,msg,Toast.LENGTH_SHORT).show();
     }
 
 }

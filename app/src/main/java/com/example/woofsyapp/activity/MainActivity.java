@@ -6,13 +6,10 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-import androidx.recyclerview.widget.DefaultItemAnimator;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -21,20 +18,22 @@ import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
-
-
 import com.example.woofsyapp.R;
-import com.example.woofsyapp.adapter.AllBreedsAdapter;
 import com.example.woofsyapp.adapter.DrawerItemCustomAdapter;
 import com.example.woofsyapp.api.Api;
-import com.example.woofsyapp.fragment.ConnectFragment;
+import com.example.woofsyapp.dao.AllBreedsDao;
+import com.example.woofsyapp.dao.LikesDao;
+import com.example.woofsyapp.database.DatabaseHelper;
 import com.example.woofsyapp.model.AllBreedsModel;
 import com.example.woofsyapp.model.DataModel;
 import com.example.woofsyapp.model.RandomDogModel;
+import com.example.woofsyapp.model.RandomGifResponse;
+import com.example.woofsyapp.util.Utils;
+import com.facebook.stetho.Stetho;
 
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -52,12 +51,17 @@ public class MainActivity extends AppCompatActivity {
     private CharSequence mDrawerTitle;
     private CharSequence mTitle;
     ActionBarDrawerToggle mDrawerToggle;
-    private ProgressDialog progressDialog;
     private Context mContext;
-    public static List<String> allBreedsData;
     public AllBreedsModel breedsData;
+    public DatabaseHelper myDb;
+    public String randomDog;
+    private int targetMenu;
+    public String randomDogImg = "";
+    private ProgressDialog progressDialog;
+
+    public static List<String> allBreedsData;
+    public static List<String> imagesList;
     public static List<String> likedImages = new LinkedList<>();
-    public static String randomDog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,19 +69,99 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         mContext = MainActivity.this;
 
+        getIds();
+        initMethod();
+        setListeners();
+        setupToolbar();
+        setDrawer();
+        setupDrawerToggle();
+
+        if(!Utils.isNetworkAvailable(this)){
+            showToast("Not connected to Internet");
+        }
+
         mTitle = mDrawerTitle = getTitle();
         mNavigationDrawerItemTitles= getResources().getStringArray(R.array.navigation_drawer_items_array);
-        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        mDrawerList = (ListView) findViewById(R.id.left_drawer);
 
-      //  getSupportActionBar().setTitle("Woofsy");
+        Stetho.initialize(
+                Stetho.newInitializerBuilder(this)
+                        .enableDumpapp(Stetho.defaultDumperPluginsProvider(this))
+                        .enableWebKitInspector(Stetho.defaultInspectorModulesProvider(this))
+                        .build());
 
-        setupToolbar();
+        allBreedsData = new AllBreedsDao(this).getBreedsList();
 
+        if(allBreedsData == null || allBreedsData.size() == 0){
+            if(Utils.isNetworkAvailable(this)){
+                CallApiAsynTask callApiAsynTask = new CallApiAsynTask();
+                callApiAsynTask.execute();
+            }else{
+                showToast("Not connected to Internet");
+            }
+        }else{
+            if(Utils.isNetworkAvailable(this)){
+                CallApi2AsynTask callApiAsynTask = new CallApi2AsynTask();
+                callApiAsynTask.execute();
+            }else{
+                showToast("Not connected to Internet");
+            }
+        }
+    }
+
+    private void setListeners() {
+        IV1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                targetMenu = 1;
+                Intent i = new Intent(MainActivity.this, AllBreedsActivity.class);
+                startActivity(i);
+            }
+        });
+        IV2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                targetMenu = 2;
+                if(Utils.isNetworkAvailable(mContext)){
+                    Intent i = new Intent(MainActivity.this, GuessTheBreedActivity.class);
+                    i.putExtra("dogImage", randomDog);
+                    startActivity(i);
+                }else{
+                    showToast("Not connected to Internet.");
+                }
+            }
+        });
+        IV3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                targetMenu = 3;
+                if(Utils.isNetworkAvailable(mContext)){
+                    Intent i = new Intent(MainActivity.this, ShakeThePawActivity.class);
+                    i.putExtra("dogImage",randomDog);
+                    startActivity(i);
+                }else{
+                    showToast("Not connected to Internet.");
+                }
+            }
+        });
+        IV4.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                targetMenu = 4;
+                if(Utils.isNetworkAvailable(mContext)){
+                    Intent i = new Intent(MainActivity.this, GifActivity.class);
+                    i.putExtra("gifString",randomDogImg);
+                    startActivity(i);
+                }else{
+                    showToast("Not connected to Internet.");
+                }
+            }
+        });
+    }
+
+    private void setDrawer() {
         DataModel[] drawerItem = new DataModel[2];
-
         drawerItem[0] = new DataModel(R.drawable.ic_favorite, "Liked Photos");
-       // drawerItem[1] = new DataModel(R.drawable.ic_favorite, "Gifs");
+        // drawerItem[1] = new DataModel(R.drawable.ic_favorite, "Gifs");
         drawerItem[1] = new DataModel(R.drawable.ic_info, "About");
         getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         getSupportActionBar().setHomeButtonEnabled(true);
@@ -87,47 +171,84 @@ public class MainActivity extends AppCompatActivity {
         mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerLayout.setDrawerListener(mDrawerToggle);
-        setupDrawerToggle();
+    }
 
-        callApiForBreeds();
+    private void initMethod() {
+        myDb = new DatabaseHelper(this);
+        targetMenu = 0;
+    }
 
+    private void getIds() {
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mDrawerList = (ListView) findViewById(R.id.left_drawer);
         IV1 = findViewById(R.id.iv_1);
         IV2 = findViewById(R.id.iv_2);
         IV3 = findViewById(R.id.iv_3);
         IV4 = findViewById(R.id.iv_4);
+    }
 
-        IV1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                callApi1();
+    class CallApiAsynTask extends AsyncTask<Void, Void, Boolean>{
+
+        private CallApiAsynTask(){
+
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... voids) {
+            callApiForBreeds();
+            return true;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean val) {
+            super.onPostExecute(val);
+                CallApi2AsynTask callApi2AsynTask = new CallApi2AsynTask();
+                callApi2AsynTask.execute();
+
+        }
+    }
+
+    class CallApi2AsynTask extends AsyncTask<Void, Void, Boolean>{
+
+        private CallApi2AsynTask(){
+
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... voids) {
+            apiGetRandomImage();
+            return true;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean val) {
+            super.onPostExecute(val);
+            if(randomDogImg == null || randomDogImg.equals("")){
+                CallApi3AsynTask callApi3AsynTask = new CallApi3AsynTask();
+                callApi3AsynTask.execute();
             }
-        });
-        IV2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                callApi2();
-//                Intent i = new Intent(MainActivity.this, GuessTheBreedActivity.class);
-//                startActivity(i);
-            }
-        });
-        IV3.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent i = new Intent(MainActivity.this, ShakeThePawActivity.class);
-                startActivity(i);
-            }
-        });
-        IV4.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent i = new Intent(MainActivity.this, GifActivity.class);
-                startActivity(i);
-            }
-        });
+        }
+    }
+
+    class CallApi3AsynTask extends AsyncTask<Void, Void, Boolean>{
+
+        private CallApi3AsynTask(){
+
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... voids) {
+            apiGif();
+            return true;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean val) {
+            super.onPostExecute(val);
+        }
     }
 
     private void callApiForBreeds() {
-       // showLoadingDialog();
         //Creating a retrofit object
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(Api.BASE_URL)
@@ -141,27 +262,26 @@ public class MainActivity extends AppCompatActivity {
         call.enqueue(new Callback<AllBreedsModel>() {
             @Override
             public void onResponse(Call<AllBreedsModel> call, Response<AllBreedsModel> response) {
-             //   dismissLoadingDialog();
                 if (response.isSuccessful() && response.body().getMessage() != null) {
                     allBreedsData = response.body().getMessage();
                     breedsData = response.body();
                     setAllBreedsData();
-//                    Intent i = new Intent(MainActivity.this, AllBreedsActivity.class);
-//                    startActivity(i);
-
+                    //setting up db
+                    AllBreedsDao objBreedsDao = new AllBreedsDao(getApplicationContext());
+                    objBreedsDao.insertBreedsLocal(allBreedsData);
+             //       dismissLoadingDialog();
                 }
             }
 
             @Override
             public void onFailure(Call<AllBreedsModel> call, Throwable t) {
-            //    dismissLoadingDialog();
                 Toast.makeText(mContext, t.getMessage(), Toast.LENGTH_LONG).show();
+           //     dismissLoadingDialog();
             }
         });
     }
 
-    private void callApi2() {
-        showLoadingDialog();
+    private void apiGetRandomImage() {
         //Creating a retrofit object
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(Api.BASE_URL)
@@ -175,56 +295,47 @@ public class MainActivity extends AppCompatActivity {
         call.enqueue(new Callback<RandomDogModel>() {
             @Override
             public void onResponse(Call<RandomDogModel> call, Response<RandomDogModel> response) {
-                dismissLoadingDialog();
                 if (response.isSuccessful() && response.body() != null) {
                     randomDog = response.body().getMessage();
-                    getRandomDogImage();
-                    Intent i = new Intent(MainActivity.this, GuessTheBreedActivity.class);
-                    startActivity(i);
-
                 }
             }
 
             @Override
             public void onFailure(Call<RandomDogModel> call, Throwable t) {
-                dismissLoadingDialog();
                 Toast.makeText(mContext, t.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
     }
 
-    private void callApi1() {
-        showLoadingDialog();
-        //Creating a retrofit object
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(Api.BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create())  //Here we are using the GsonConverterFactory to directly convert json data to object
-                .build();
+    private void apiGif(){
+            Random random = new Random();
+            int offset = random.nextInt(4000);
+            String api_key = "fH0BpGnLRdA12yZYn2zETY4Ka4IBoeXz";
 
-        //creating the api interface
-        Api api = retrofit.create(Api.class);
-        Call<AllBreedsModel> call = api.getAllBreedsList();
+            //Creating a retrofit object
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(Api.BASE_URL_GIPHY)
+                    .addConverterFactory(GsonConverterFactory.create())  //Here we are using the GsonConverterFactory to directly convert json data to object
+                    .build();
 
-        call.enqueue(new Callback<AllBreedsModel>() {
-            @Override
-            public void onResponse(Call<AllBreedsModel> call, Response<AllBreedsModel> response) {
-                dismissLoadingDialog();
-                if (response.isSuccessful() && response.body().getMessage() != null) {
-                    allBreedsData = response.body().getMessage();
-                    breedsData = response.body();
-                    setAllBreedsData();
-                    Intent i = new Intent(MainActivity.this, AllBreedsActivity.class);
-                    startActivity(i);
+            //creating the api interface
+            Api api = retrofit.create(Api.class);
+            Call<RandomGifResponse> call = api.getRandomGif(offset,api_key);
 
+            call.enqueue(new Callback<RandomGifResponse>() {
+                @Override
+                public void onResponse(Call<RandomGifResponse> call, Response<RandomGifResponse> response) {
+                    if (response.isSuccessful() && response.body() != null) {
+                        randomDogImg = response.body().getData().get(0).getImages().getOriginal().getUrl();
+
+                    }
                 }
-            }
 
-            @Override
-            public void onFailure(Call<AllBreedsModel> call, Throwable t) {
-                dismissLoadingDialog();
-                Toast.makeText(mContext, t.getMessage(), Toast.LENGTH_LONG).show();
-            }
-        });
+                @Override
+                public void onFailure(Call<RandomGifResponse> call, Throwable t) {
+                    Toast.makeText(mContext, t.getMessage(), Toast.LENGTH_LONG).show();
+                }
+            });
     }
 
     public static List<String> setAllBreedsData() {
@@ -232,10 +343,6 @@ public class MainActivity extends AppCompatActivity {
             return null;
 
         return allBreedsData;
-    }
-
-    public static String getRandomDogImage() {
-        return randomDog;
     }
 
     private class DrawerItemClickListener implements ListView.OnItemClickListener {
@@ -315,45 +422,25 @@ public class MainActivity extends AppCompatActivity {
         mDrawerToggle.syncState();
     }
 
-    private void showLoadingDialog() {
-        progressDialog = ProgressDialog.show(mContext, null, this.getString(R.string.loading), false, false);
-    }
+    public List<String> updateLikedImages(String img, Context context){
 
-    private void dismissLoadingDialog() {
-        try {
-            if (progressDialog.isShowing()) {
-                progressDialog.dismiss();
-            }
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            progressDialog = null;
+        likedImages = new LikesDao(context).getLikesList();
+        if(likedImages == null){
+            likedImages = new LinkedList<>();
         }
-    }
-
-    public List<String> updateLikedImages(String img){
 
         if(likedImages.contains(img)){
             likedImages.remove(img);
+            new LikesDao(context).deleteData(img);
         }
         else{
             likedImages.add(img);
+            new LikesDao(context).insertPhotoLocal(img);
         }
 
         return likedImages;
     }
 
-    public List<String> getLikedImages(){
-
-        return likedImages;
-    }
-
-    public void setImagesList(List<String> updatedList){
-
-        likedImages = updatedList;
-    }
 
     void showToast(String msg){
         Toast.makeText(MainActivity.this,msg,Toast.LENGTH_SHORT).show();

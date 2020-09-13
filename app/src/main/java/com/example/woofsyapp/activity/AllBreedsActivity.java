@@ -3,44 +3,37 @@ package com.example.woofsyapp.activity;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.example.woofsyapp.R;
 import com.example.woofsyapp.adapter.AllBreedsAdapter;
 import com.example.woofsyapp.api.Api;
 import com.example.woofsyapp.model.AllBreedsModel;
-
-import org.json.JSONArray;
+import com.example.woofsyapp.util.Utils;
 
 import java.util.List;
-
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+import static com.example.woofsyapp.activity.MainActivity.allBreedsData;
+import static com.example.woofsyapp.activity.MainActivity.imagesList;
+
 public class AllBreedsActivity extends AppCompatActivity {
 
     private AllBreedsAdapter adapter;
     private RecyclerView recyclerView;
     private RecyclerView.LayoutManager layoutManager;
-    public List<String> allBreedsData;
-    public static List<String> imagesList;
     private Context mContext;
-    public AllBreedsModel breedsData;
-    private SwipeRefreshLayout swipeContainer;
+    //private SwipeRefreshLayout swipeContainer;
     private ProgressDialog progressDialog;
     private String selectedBreed;
     private Intent intent2;
@@ -51,42 +44,22 @@ public class AllBreedsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_all_breeds);
         mContext = AllBreedsActivity.this;
-        allBreedsData = new MainActivity().setAllBreedsData();
         flag = -1;
 
         getSupportActionBar().setTitle("List Of All Breeds");
-
         setRecyclerView();
-
-        if(progressDialog != null)
-            dismissLoadingDialog();
-
-        // Lookup the swipe container view
-        swipeContainer = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh);
-        // Setup refresh listener which triggers new data loading
-        swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                allBreedsData.clear();
-                // Your code to refresh the list here.
-                // Make sure you call swipeContainer.setRefreshing(false)
-                // once the network request has completed successfully.
-                callApi();
-                // Now we call setRefreshing(false) to signal refresh has finished
-                swipeContainer.setRefreshing(false);
-            }
-        });
-        // Configure the refreshing colors
-        swipeContainer.setColorSchemeResources(android.R.color.holo_blue_bright,
-                android.R.color.holo_green_light,
-                android.R.color.holo_orange_light,
-                android.R.color.holo_red_light);
-
         selectedBreed = "beagle";
-        callApi2();
     }
 
-    private void callApi() {
+    public List<String> setImagesList() {
+        if(imagesList == null){
+            callApiForImages();
+        }
+
+        return imagesList;
+    }
+
+    private void callApiForImages() {
         showLoadingDialog();
         //Creating a retrofit object
         Retrofit retrofit = new Retrofit.Builder()
@@ -96,32 +69,24 @@ public class AllBreedsActivity extends AppCompatActivity {
 
         //creating the api interface
         Api api = retrofit.create(Api.class);
-        Call<AllBreedsModel> call = api.getAllBreedsList();
+        Call<AllBreedsModel> call = api.getAllImagesOfBreed(selectedBreed);
 
         call.enqueue(new Callback<AllBreedsModel>() {
             @Override
             public void onResponse(Call<AllBreedsModel> call, Response<AllBreedsModel> response) {
-                dismissLoadingDialog();
                 if (response.isSuccessful() && response.body().getMessage() != null) {
-                    allBreedsData = response.body().getMessage();
-                    breedsData = response.body();
-                    setRecyclerView();
+                    imagesList = response.body().getMessage();
+                    if(flag == 0){
+                        startActivity(intent2);
+                    }
                 }
             }
 
             @Override
             public void onFailure(Call<AllBreedsModel> call, Throwable t) {
-                dismissLoadingDialog();
-                Toast.makeText(mContext, t.getMessage(), Toast.LENGTH_LONG).show();
+             //   Toast.makeText(mContext, t.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
-    }
-
-    public static List<String> setImagesList() {
-        if(imagesList == null)
-            return null;
-
-        return imagesList;
     }
 
     private void setRecyclerView() {
@@ -143,51 +108,29 @@ public class AllBreedsActivity extends AppCompatActivity {
         adapter.setOnItemClickListener(new AllBreedsAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                intent2 = new Intent(AllBreedsActivity.this, BreedDetailActivity.class);
-                intent2.putExtra("breedType", allBreedsData.get(position));
-                selectedBreed = allBreedsData.get(position);
-                flag = 0;
-                callApi2();
-                setImagesList();
-
-            }
-        });
-    }
-
-    private void callApi2() {
-        showLoadingDialog();
-        //Creating a retrofit object
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(Api.BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create())  //Here we are using the GsonConverterFactory to directly convert json data to object
-                .build();
-
-        //creating the api interface
-        Api api = retrofit.create(Api.class);
-        Call<AllBreedsModel> call = api.getAllImagesOfBreed(selectedBreed);
-
-        call.enqueue(new Callback<AllBreedsModel>() {
-            @Override
-            public void onResponse(Call<AllBreedsModel> call, Response<AllBreedsModel> response) {
-                if (response.isSuccessful() && response.body().getMessage() != null) {
-                    imagesList = response.body().getMessage();
-                    if(flag == 0){
-                        startActivity(intent2);
+                if(Utils.isNetworkAvailable(mContext)){
+                    intent2 = new Intent(AllBreedsActivity.this, BreedDetailActivity.class);
+                    if(allBreedsData != null){
+                        intent2.putExtra("breedType", allBreedsData.get(position));
+                        selectedBreed = allBreedsData.get(position);
                     }
-                    dismissLoadingDialog();
+                    flag = 0;
+                    callApiForImages();
+                }else{
+                    showToast("Not connected to Internet.");
                 }
-            }
-
-            @Override
-            public void onFailure(Call<AllBreedsModel> call, Throwable t) {
-                dismissLoadingDialog();
-                Toast.makeText(mContext, t.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
     }
 
     private void showLoadingDialog() {
         progressDialog = ProgressDialog.show(mContext, null, this.getString(R.string.loading), false, false);
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        dismissLoadingDialog();
     }
 
     private void dismissLoadingDialog() {
@@ -202,6 +145,10 @@ public class AllBreedsActivity extends AppCompatActivity {
         } finally {
             progressDialog = null;
         }
+    }
+
+    void showToast(String msg){
+        Toast.makeText(AllBreedsActivity.this,msg,Toast.LENGTH_SHORT).show();
     }
 
 }

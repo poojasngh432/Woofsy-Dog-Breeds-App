@@ -10,11 +10,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Toast;
-
 import com.example.woofsyapp.R;
 import com.example.woofsyapp.adapter.BreedTypeImagesAdapter;
-
+import com.example.woofsyapp.dao.LikesDao;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -31,15 +29,15 @@ public class LikesActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_likes);
-
         mContext = LikesActivity.this;
+
+        getSupportActionBar().setTitle("Liked Doggos");
+
         allImages = new LinkedList<>();
-        allImages = new MainActivity().getLikedImages();
+        allImages = new LikesDao(this).getLikesList();
 
         //showLoadingDialog();
         setRecyclerView();
-
-        getSupportActionBar().setTitle("Liked Doggos");
 
     }
 
@@ -50,15 +48,10 @@ public class LikesActivity extends AppCompatActivity {
             recyclerView.setLayoutManager(gridLayoutManager);
             recyclerView.setItemAnimator(new DefaultItemAnimator());
             recyclerView.setNestedScrollingEnabled(false);
-            //  adapter = new AllBreedsAdapter(allBreedsData, mContext);
             adapter = new BreedTypeImagesAdapter(allImages, mContext);
             recyclerView.setAdapter(adapter);
             adapter.notifyDataSetChanged();
             initListener();
-            // if(adapter != null && adapter.getItemCount() != 0) {
-            Toast.makeText(mContext, String.valueOf(adapter.getItemCount()), Toast.LENGTH_LONG).show();
-            //      dismissLoadingDialog();
-
         }
     }
 
@@ -77,6 +70,13 @@ public class LikesActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        allImages = new LinkedList<>();
+        allImages = new LikesDao(this).getLikesList();
+        setRecyclerView();
+    }
 
     private void showLoadingDialog() {
         progressDialog = ProgressDialog.show(mContext, null, this.getString(R.string.loading), false, false);

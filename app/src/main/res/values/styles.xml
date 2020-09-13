@@ -10,4 +10,49 @@
         <item name="windowNoTitle">true</item>
     </style>
 
+    <style name="dialog_theme">
+        <item name="windowActionBar">false</item>
+        <item name="windowActionModeOverlay">true</item>
+
+        <item name="listPreferredItemPaddingLeft">16dip</item>
+        <item name="listPreferredItemPaddingRight">16dip</item>
+        <item name="listPreferredItemPaddingStart">16dip</item>
+        <item name="listPreferredItemPaddingEnd">16dip</item>
+    </style>
+
+    <style name="dialog_theme_correct" parent="@android:style/Theme.Material.Light.Dialog.Alert">
+        <item name="android:windowTitleStyle">@style/dialogTitleCorrect</item>
+    </style>
+
+    <style name="dialog_theme_wrong" parent="@android:style/Theme.Material.Light.Dialog.Alert">
+        <item name="android:windowTitleStyle">@style/dialogTitleWrong</item>
+    </style>
+
+    <style name="dialogTitleCorrect" parent="@android:style/TextAppearance.DialogWindowTitle">
+        <item name="android:background">@color/end_marker</item>
+        <item name="android:textAppearance">@style/textStyle</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:padding">8dp</item>
+    </style>
+
+    <style name="dialogTitleWrong" parent="@android:style/TextAppearance.DialogWindowTitle">
+        <item name="android:background">@color/red</item>
+        <item name="android:textAppearance">@style/textStyle</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:padding">8dp</item>
+    </style>
+
+    <style name="textStyle">
+        <item name="android:gravity">center_horizontal</item>
+        <item name="android:layout_gravity">center_horizontal</item>
+        <item name="android:textAlignment">center</item>
+    </style>
+
+    <style name="dialog_animation">
+        <item name="android:windowEnterAnimation">@anim/slide_in_left</item>
+        <item name="android:windowExitAnimation">@anim/slide_out_right</item>
+    </style>
+
 </resources>

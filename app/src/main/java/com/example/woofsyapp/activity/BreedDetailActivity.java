@@ -12,20 +12,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
-
 import com.example.woofsyapp.R;
-import com.example.woofsyapp.adapter.AllBreedsAdapter;
 import com.example.woofsyapp.adapter.BreedTypeImagesAdapter;
-import com.example.woofsyapp.api.Api;
-import com.example.woofsyapp.model.AllBreedsModel;
+import com.example.woofsyapp.util.Utils;
 
 import java.util.List;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 public class BreedDetailActivity extends AppCompatActivity {
     private String breedType;
@@ -40,17 +31,14 @@ public class BreedDetailActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_breed_detail);
-
         mContext = BreedDetailActivity.this;
-        allImages = new AllBreedsActivity().setImagesList();
-
-        setRecyclerView();
+        getSupportActionBar().setTitle(breedType);
 
         Intent intent = getIntent();
         breedType = intent.getStringExtra("breedType");
 
-        getSupportActionBar().setTitle(breedType);
-
+        allImages = new AllBreedsActivity().setImagesList();
+        setRecyclerView();
     }
 
     private void setRecyclerView() {
@@ -62,10 +50,9 @@ public class BreedDetailActivity extends AppCompatActivity {
             recyclerView.setNestedScrollingEnabled(false);
             adapter = new BreedTypeImagesAdapter(allImages, mContext);
             recyclerView.setAdapter(adapter);
+            dismissLoadingDialog();
             adapter.notifyDataSetChanged();
             initListener();
-            Toast.makeText(mContext, String.valueOf(adapter.getItemCount()), Toast.LENGTH_LONG).show();
-
         }
     }
 
@@ -75,19 +62,18 @@ public class BreedDetailActivity extends AppCompatActivity {
             @Override
             public void onItemClick(View view, int position) {
 
-                Intent intent = new Intent(BreedDetailActivity.this, DogActivity.class);
+                if(Utils.isNetworkAvailable(mContext)){
+                    Intent intent = new Intent(BreedDetailActivity.this, DogActivity.class);
 
-                intent.putExtra("imageAddress", allImages.get(position));
-                intent.putExtra("breedType", breedType);
+                    intent.putExtra("imageAddress", allImages.get(position));
+                    intent.putExtra("breedType", breedType);
 
-                startActivity(intent);
+                    startActivity(intent);
+                }else{
+                    showToast("Not connected to Internet.");
+                }
             }
         });
-    }
-
-
-    private void showLoadingDialog() {
-        progressDialog = ProgressDialog.show(mContext, null, this.getString(R.string.loading), false, false);
     }
 
     private void dismissLoadingDialog() {
@@ -102,6 +88,10 @@ public class BreedDetailActivity extends AppCompatActivity {
         } finally {
             progressDialog = null;
         }
+    }
+
+    void showToast(String msg){
+        Toast.makeText(BreedDetailActivity.this,msg,Toast.LENGTH_SHORT).show();
     }
 
 }
