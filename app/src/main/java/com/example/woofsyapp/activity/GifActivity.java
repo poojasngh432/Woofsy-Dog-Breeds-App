@@ -276,9 +276,7 @@ public class GifActivity extends AppCompatActivity {
                 DownloadManager.Request request = new DownloadManager.Request(downloadUri);
 
             request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI | DownloadManager.Request.NETWORK_MOBILE)
-                    .setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, file)
-                    .setTitle("Gif Download").setDescription("processing..")
-                    .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+                    .setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, file);
 
             dm.enqueue(request);
 
@@ -338,7 +336,7 @@ public class GifActivity extends AppCompatActivity {
     private void changeImage(String randomDogImg) {
         RequestOptions requestOptions = new RequestOptions();
         requestOptions.placeholder(Utils.getRandomDrawbleColor());
-        requestOptions.error(Utils.getRandomDrawbleColor());
+        requestOptions.error(R.drawable.ic_dog_playing);
         requestOptions.diskCacheStrategy(DiskCacheStrategy.ALL);
         requestOptions.fitCenter();
 
