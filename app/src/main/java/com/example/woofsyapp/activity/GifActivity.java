@@ -81,8 +81,6 @@ public class GifActivity extends AppCompatActivity {
         setContentView(R.layout.activity_gif);
         mContext = GifActivity.this;
 
-        getSupportActionBar().setTitle("Gifs");
-
         Intent intent = getIntent();
         randomDogImg = intent.getStringExtra("gifString");
 
@@ -90,6 +88,8 @@ public class GifActivity extends AppCompatActivity {
         setListeners();
 
         dialog = new ProgressDialog(GifActivity.this);
+
+        getSupportActionBar().setTitle("GIFS");
 
         if(randomDogImg == null){
             CallApiAsyncTask callApiAsynTask = new CallApiAsyncTask();
@@ -133,6 +133,10 @@ public class GifActivity extends AppCompatActivity {
         IVLike.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                allImages = new LinkedList<>();
+                allImages = new LikesDao(GifActivity.this).getLikesList();
+
                 if(allImages.contains(randomDogImg)){
                     IVLike.setImageDrawable(getResources().getDrawable(R.drawable.ic_unlike_red));
                     showToast("Photo unliked.");
@@ -213,7 +217,7 @@ public class GifActivity extends AppCompatActivity {
             //Asynctask to create a thread to download image in the background
             new DownloadImage().execute(randomDogImg);
         } else {
-            showToast("Need Permission to access storage for Downloading Image");
+            showToast("Need Permission to access storage for Downloading Gif");
         }
     }
 
@@ -345,6 +349,9 @@ public class GifActivity extends AppCompatActivity {
                     @Override
                     public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
                         progressBar.setVisibility(View.GONE);
+                        if (dialog.isShowing()) {
+                            dialog.dismiss();
+                        }
                         return false;
                     }
 

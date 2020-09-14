@@ -67,7 +67,7 @@ public class GuessTheBreedActivity extends AppCompatActivity {
         setIds();
         setListeners();
         setChoices();
-        setImage();
+       // setImage();
 
     }
 
@@ -107,6 +107,7 @@ public class GuessTheBreedActivity extends AppCompatActivity {
         if(dogImage != null){
             strArr = dogImage.split("/");
             correctAnswer = strArr[4];
+            setImage();
         }else{
             callApi();
         }

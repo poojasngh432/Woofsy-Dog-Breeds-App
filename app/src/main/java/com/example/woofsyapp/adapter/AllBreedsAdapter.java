@@ -8,24 +8,48 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.target.Target;
 import com.example.woofsyapp.R;
+import com.example.woofsyapp.activity.AllBreedsActivity;
+import com.example.woofsyapp.api.Api;
+import com.example.woofsyapp.model.AllBreedsModel;
+import com.example.woofsyapp.model.RandomDogModel;
 import com.example.woofsyapp.util.Utils;
 
+import java.util.HashMap;
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+
+import static com.example.woofsyapp.activity.MainActivity.imagesList;
 
 public class AllBreedsAdapter extends RecyclerView.Adapter<AllBreedsAdapter.MyViewHolder> {
     private List<String> breeds;
     private Context context;
     private OnItemClickListener onItemClickListener;
+    private HashMap<String,String> map;
 
-    public AllBreedsAdapter(List<String> breeds, Context context) {
+    public AllBreedsAdapter(List<String> breeds, Context context, HashMap<String,String> map) {
         this.breeds = breeds;
         this.context = context;
+        this.map = map;
     }
 
     @NonNull
@@ -39,31 +63,36 @@ public class AllBreedsAdapter extends RecyclerView.Adapter<AllBreedsAdapter.MyVi
     public void onBindViewHolder(@NonNull MyViewHolder holders, int position) {
         final MyViewHolder holder = holders;
         String breedName = breeds.get(position);
+        String imageUrl = "";
 
-//        RequestOptions requestOptions = new RequestOptions();
-//        requestOptions.placeholder(Utils.getRandomDrawbleColor());
-//        requestOptions.error(Utils.getRandomDrawbleColor());
-//        requestOptions.diskCacheStrategy(DiskCacheStrategy.ALL);
-//        requestOptions.centerCrop();
+        if(map.containsKey(breedName)){
+            imageUrl = map.get(breedName);
+        }
 
-//        Glide.with(context)
-//                .load(model.getUrlToImage())
-//                .apply(requestOptions)
-//                .listener(new RequestListener<Drawable>() {
-//                    @Override
-//                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
-//                        holder.progressBar.setVisibility(View.GONE);
-//                        return false;
-//                    }
-//
-//                    @Override
-//                    public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
-//                        holder.progressBar.setVisibility(View.GONE);
-//                        return false;
-//                    }
-//                })
-//                .transition(DrawableTransitionOptions.withCrossFade())
-//                .into(holder.imageView);
+        RequestOptions requestOptions = new RequestOptions();
+        requestOptions.placeholder(R.drawable.ic_dog_six);
+        requestOptions.error(R.drawable.ic_dog_six);
+        requestOptions.diskCacheStrategy(DiskCacheStrategy.ALL);
+        requestOptions.circleCrop();
+
+        Glide.with(context)
+                .load(imageUrl)
+                .apply(requestOptions)
+                .listener(new RequestListener<Drawable>() {
+                    @Override
+                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                        holder.progressBar.setVisibility(View.GONE);
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                        holder.progressBar.setVisibility(View.GONE);
+                        return false;
+                    }
+                })
+                .transition(DrawableTransitionOptions.withCrossFade())
+                .into(holder.imageView);
 
         holder.TVbreed.setText(breedName);
     }
@@ -96,7 +125,7 @@ public class AllBreedsAdapter extends RecyclerView.Adapter<AllBreedsAdapter.MyVi
     public class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
         TextView TVbreed;
-       // ImageView imageView;
+        ImageView imageView;
         ProgressBar progressBar;
         OnItemClickListener onItemClickListener;
 
@@ -105,6 +134,8 @@ public class AllBreedsAdapter extends RecyclerView.Adapter<AllBreedsAdapter.MyVi
 
             itemView.setOnClickListener(this);
             TVbreed = itemView.findViewById(R.id.textview_breed);
+            imageView = itemView.findViewById(R.id.iv_breed);
+            progressBar = itemView.findViewById(R.id.progress_load_photo);
 
             this.onItemClickListener = onItemClickListener;
         }

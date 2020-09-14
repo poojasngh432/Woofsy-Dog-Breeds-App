@@ -4,14 +4,10 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -30,11 +26,9 @@ import com.example.woofsyapp.model.RandomDogModel;
 import com.example.woofsyapp.model.RandomGifResponse;
 import com.example.woofsyapp.util.Utils;
 import com.facebook.stetho.Stetho;
-
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
-
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -57,7 +51,6 @@ public class MainActivity extends AppCompatActivity {
     public String randomDog;
     private int targetMenu;
     public String randomDogImg = "";
-    private ProgressDialog progressDialog;
 
     public static List<String> allBreedsData;
     public static List<String> imagesList;
@@ -269,14 +262,12 @@ public class MainActivity extends AppCompatActivity {
                     //setting up db
                     AllBreedsDao objBreedsDao = new AllBreedsDao(getApplicationContext());
                     objBreedsDao.insertBreedsLocal(allBreedsData);
-             //       dismissLoadingDialog();
                 }
             }
 
             @Override
             public void onFailure(Call<AllBreedsModel> call, Throwable t) {
                 Toast.makeText(mContext, t.getMessage(), Toast.LENGTH_LONG).show();
-           //     dismissLoadingDialog();
             }
         });
     }
@@ -356,35 +347,18 @@ public class MainActivity extends AppCompatActivity {
 
     private void selectItem(int position) {
 
-        Fragment fragment = null;
-
         switch (position) {
             case 0:
                 Intent intent = new Intent(MainActivity.this, LikesActivity.class);
                 startActivity(intent);
                 break;
-//            case 1:
-//                fragment = new FixturesFragment();
-//                break;
-//            case 2:
-//                fragment = new TableFragment();
-//                break;
+            case 1:
+                Intent intent2 = new Intent(MainActivity.this, AboutActivity.class);
+                startActivity(intent2);
+                break;
 
             default:
                 break;
-        }
-
-        if (fragment != null) {
-            FragmentManager fragmentManager = getSupportFragmentManager();
-            fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
-
-            mDrawerList.setItemChecked(position, true);
-            mDrawerList.setSelection(position);
-            setTitle(mNavigationDrawerItemTitles[position]);
-            mDrawerLayout.closeDrawer(mDrawerList);
-
-        } else {
-            Log.e("MainActivity", "Error in creating fragment");
         }
     }
 

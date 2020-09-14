@@ -37,6 +37,10 @@ public class BreedDetailActivity extends AppCompatActivity {
         Intent intent = getIntent();
         breedType = intent.getStringExtra("breedType");
 
+        if(breedType != null){
+            getSupportActionBar().setTitle(breedType);
+        }
+
         allImages = new AllBreedsActivity().setImagesList();
         setRecyclerView();
     }

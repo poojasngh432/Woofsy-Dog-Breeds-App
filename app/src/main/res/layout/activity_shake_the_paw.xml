@@ -7,20 +7,33 @@
     android:background="@android:color/white"
     tools:context=".activity.ShakeThePawActivity">
 
-            <TextView
-            android:id="@+id/breed_name_tv"
-            android:layout_width="match_parent"
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_alignParentTop="true"
+        android:gravity="center_horizontal">
+        <TextView
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginStart="8dp"
-            android:fontFamily="serif"
+            android:text="Breed Name: "
+            android:fontFamily="casual"
+            android:textSize="@dimen/sp_20"
+            android:textColor="@android:color/black"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"/>
+        <TextView
+            android:id="@+id/name_of_breed_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="casual"
+            android:textSize="@dimen/sp_20"
             android:textColor="@android:color/black"
             android:text="Name of the breed"
             android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-            android:gravity="center_horizontal"
-                android:layout_marginTop="15dp"
-                android:layout_alignParentTop="true"/>
+            android:gravity="center_horizontal"/>
+    </LinearLayout>
 
     <ImageView
         android:id="@+id/iv_dog_img"
@@ -46,12 +59,13 @@
         android:id="@+id/btn_random"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="24dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:textAllCaps="false"
-        android:background="@color/lightest_green"
-        android:textColor="@color/text_color_link"
+        android:layout_marginTop="@dimen/dp_20"
+        android:layout_marginBottom="@dimen/dp_20"
+        android:layout_marginEnd="@dimen/dp_15"
+        android:layout_marginStart="@dimen/dp_15"
+        android:textAllCaps="true"
+        android:background="@drawable/rounded_corner_button_dark_pink"
+        android:textColor="@color/white"
         android:layout_alignParentBottom="true"
-        android:text="Random Dog"/>
+        android:text="See Next Dog"/>
 </RelativeLayout>

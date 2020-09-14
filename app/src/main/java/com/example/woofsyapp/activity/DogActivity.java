@@ -53,6 +53,10 @@ public class DogActivity extends AppCompatActivity {
         imageAddress = intent.getStringExtra("imageAddress");
         breedType = intent.getStringExtra("breedType");
 
+        if(breedType != null){
+            getSupportActionBar().setTitle(breedType);
+        }
+
         setIds();
         setListeners();
 
@@ -114,6 +118,9 @@ public class DogActivity extends AppCompatActivity {
         IVLike.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                allImages = new LinkedList<>();
+                allImages = new LikesDao(DogActivity.this).getLikesList();
 
                 if(allImages.contains(imageAddress)){
                     IVLike.setImageDrawable(getResources().getDrawable(R.drawable.ic_unlike_red));

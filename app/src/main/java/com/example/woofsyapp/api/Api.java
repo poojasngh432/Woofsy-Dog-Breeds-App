@@ -23,6 +23,9 @@ public interface Api {
     @GET("breeds/image/random")
     Call<RandomDogModel> getRandomDog();
 
+    @GET("breed/{type}/images/random")
+    Call<RandomDogModel> getDogImage(@Path("type") String breedType);
+
     @GET("breed/{type}/images")
     Call<AllBreedsModel> getAllImagesOfBreed(@Path("type") String breedType);
 

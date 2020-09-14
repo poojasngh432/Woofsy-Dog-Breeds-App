@@ -85,7 +85,7 @@ public class ShakeThePawActivity extends AppCompatActivity {
         ivDog = findViewById(R.id.iv_dog_img);
         progressBar = findViewById(R.id.progress_load_photo);
         btnRandom = findViewById(R.id.btn_random);
-        breedNameTV = findViewById(R.id.breed_name_tv);
+        breedNameTV = findViewById(R.id.name_of_breed_tv);
     }
 
     private void callApi2() {
@@ -136,6 +136,7 @@ public class ShakeThePawActivity extends AppCompatActivity {
                     @Override
                     public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
                         progressBar.setVisibility(View.GONE);
+                        dismissLoadingDialog();
                         return false;
                     }
 

@@ -13,34 +13,35 @@
         android:allowBackup="true"
         android:icon="@drawable/ic_dog_main"
         android:label="@string/app_name"
+        android:requestLegacyExternalStorage="true"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        tools:ignore="GoogleAppIndexingWarning"
-        android:requestLegacyExternalStorage="true">
+        tools:ignore="GoogleAppIndexingWarning">
+        <activity android:name=".activity.AboutActivity"></activity>
         <activity
             android:name=".activity.LikesActivity"
             android:label="Breed Name"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.AppCompat.DayNight.DarkActionBar"/>
+            android:theme="@style/Theme.AppCompat.DayNight.DarkActionBar" />
         <activity
             android:name=".activity.GifActivity"
             android:label="Gifs"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.AppCompat.DayNight.DarkActionBar"/>
+            android:theme="@style/Theme.AppCompat.DayNight.DarkActionBar" />
         <activity
             android:name=".activity.ShakeThePawActivity"
-            android:label="Shake The Paw"
+            android:label="Learn Breed Names"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.AppCompat.DayNight.DarkActionBar"/>
+            android:theme="@style/Theme.AppCompat.DayNight.DarkActionBar" />
         <activity
             android:name=".activity.GuessTheBreedActivity"
             android:label="Guess The Breed"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.AppCompat.DayNight.DarkActionBar"/>
+            android:theme="@style/Theme.AppCompat.DayNight.DarkActionBar" />
         <activity
             android:name=".activity.DogActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.AppCompat.DayNight.DarkActionBar"/>
+            android:theme="@style/Theme.AppCompat.DayNight.DarkActionBar" />
         <activity
             android:name=".activity.BreedDetailActivity"
             android:screenOrientation="portrait"

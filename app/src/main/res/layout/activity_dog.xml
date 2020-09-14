@@ -1,13 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".activity.DogActivity">
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
 
         <ImageView
             android:id="@+id/dog_imageview"
@@ -28,7 +24,8 @@
             android:layout_height="50dp"
             android:weightSum="3"
             android:layout_alignParentBottom="true"
-            android:padding="10dp">
+            android:padding="10dp"
+            android:layout_marginBottom="@dimen/dp_5">
             <ImageView
                 android:layout_width="0dp"
                 android:layout_height="30dp"
@@ -50,5 +47,3 @@
         </LinearLayout>
 
     </RelativeLayout>
-
-</FrameLayout>

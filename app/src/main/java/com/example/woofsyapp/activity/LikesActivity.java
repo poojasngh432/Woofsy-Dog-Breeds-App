@@ -60,10 +60,14 @@ public class LikesActivity extends AppCompatActivity {
         adapter.setOnItemClickListener(new BreedTypeImagesAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-
-                Intent intent = new Intent(LikesActivity.this, DogActivity.class);
-
-                intent.putExtra("imageAddress", allImages.get(position));
+                Intent intent;
+                if(allImages.get(position).contains("gif")){
+                    intent = new Intent(LikesActivity.this, GifActivity.class);
+                    intent.putExtra("gifString", allImages.get(position));
+                }else{
+                    intent = new Intent(LikesActivity.this, DogActivity.class);
+                    intent.putExtra("imageAddress", allImages.get(position));
+                }
 
                 startActivity(intent);
             }

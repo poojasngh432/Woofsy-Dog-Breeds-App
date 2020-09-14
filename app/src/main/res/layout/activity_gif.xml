@@ -12,16 +12,15 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
-        android:fontFamily="serif"
-        android:textColor="@android:color/white"
-        android:text="FURRY FRIENDS IN GIFS"
-        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:fontFamily="cursive"
+        android:textColor="@color/dark_pink"
+        android:text="@string/gif_activity_title"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
         android:gravity="center_horizontal"
-        android:layout_marginTop="15dp"
+        android:layout_marginTop="@dimen/dp_10"
         android:layout_alignParentTop="true"
-        android:background="@color/dark_pink"
         android:padding="15dp"
-        android:textAllCaps="true"/>
+        android:textAllCaps="false"/>
 
     <ImageView
         android:id="@+id/iv_dog_img"
@@ -44,51 +43,45 @@
         android:layout_centerVertical="true"/>
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
         android:id="@+id/actions_ll"
-        android:layout_above="@+id/btn_random"
-        android:padding="15dp"
-        android:orientation="horizontal"
-        android:weightSum="6"
-        android:background="@color/colorPrimaryDark">
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:weightSum="3"
+        android:padding="10dp"
+        android:layout_marginBottom="@dimen/dp_5"
+        android:layout_above="@id/btn_random">
+
         <ImageView
             android:layout_width="0dp"
             android:layout_height="30dp"
             android:id="@+id/iv_share"
             android:layout_weight="1"
-            android:src="@drawable/ic_share_white"/>
+            android:src="@drawable/ic_share"/>
         <ImageView
             android:layout_width="0dp"
             android:layout_height="30dp"
             android:id="@+id/iv_download"
             android:layout_weight="1"
-            android:src="@drawable/ic_download_white"/>
+            android:src="@drawable/ic_download"/>
         <ImageView
             android:layout_width="0dp"
             android:layout_height="30dp"
             android:id="@+id/iv_like"
             android:layout_weight="1"
             android:src="@drawable/ic_unlike_red"/>
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Source: Giphy "
-            android:textColor="@color/white"
-            android:layout_weight="3"
-            android:gravity="end"
-            android:layout_marginRight="10dp"
-            android:textSize="15sp"/>
     </LinearLayout>
 
     <Button
         android:id="@+id/btn_random"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="24dp"
+        android:layout_marginTop="@dimen/dp_10"
+        android:layout_marginBottom="@dimen/dp_10"
+        android:layout_marginLeft="@dimen/dp_20"
+        android:layout_marginRight="@dimen/dp_20"
         android:textAllCaps="true"
-        android:background="@color/green"
+        android:background="@drawable/rounded_corner_button_dark_pink"
         android:textColor="@color/white"
         android:layout_alignParentBottom="true"
-        android:text="Get Random Gif"/>
+        android:text="@string/see_next_gif"/>
 </RelativeLayout>
