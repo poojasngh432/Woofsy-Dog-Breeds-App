@@ -7,14 +7,33 @@
     android:background="@android:color/white"
     tools:context=".activity.ShakeThePawActivity">
 
+    <ImageView
+        android:id="@+id/iv_dog_img"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="fitCenter"
+        tools:srcCompat="@drawable/ic_dog"
+        android:layout_above="@+id/breed_name_ll"
+        android:foregroundGravity="center"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:layout_centerInParent="true"/>
+
+    <ProgressBar
+        android:id="@+id/progress_load_photo"
+        style="@android:style/Widget.ProgressBar.Small"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"/>
+
     <LinearLayout
+        android:id="@+id/breed_name_ll"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginBottom="10dp"
         android:layout_marginTop="10dp"
-        android:layout_alignParentTop="true"
-        android:gravity="center_horizontal">
+        android:gravity="center_horizontal"
+        android:layout_above="@+id/btn_random">
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -35,31 +54,11 @@
             android:gravity="center_horizontal"/>
     </LinearLayout>
 
-    <ImageView
-        android:id="@+id/iv_dog_img"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:scaleType="fitCenter"
-        tools:srcCompat="@drawable/ic_dog"
-        android:layout_below="@+id/breed_name_tv"
-        android:layout_above="@+id/btn_random"
-        android:foregroundGravity="center"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true"
-        android:layout_centerInParent="true"/>
-
-    <ProgressBar
-        android:id="@+id/progress_load_photo"
-        style="@android:style/Widget.ProgressBar.Small"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_centerVertical="true"/>
-
     <Button
         android:id="@+id/btn_random"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/dp_20"
+        android:layout_marginTop="@dimen/dp_10"
         android:layout_marginBottom="@dimen/dp_20"
         android:layout_marginEnd="@dimen/dp_15"
         android:layout_marginStart="@dimen/dp_15"

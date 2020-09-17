@@ -11,7 +11,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:foreground="@drawable/selector_foreground_images"
-            android:scaleType="center"/>
+            android:scaleType="center"
+            android:layout_above="@+id/breed_name_ll"/>
         <ProgressBar
             android:id="@+id/progress_load_photo"
             style="@android:style/Widget.ProgressBar.Small"
@@ -19,12 +20,42 @@
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"/>
 
+    <LinearLayout
+        android:id="@+id/breed_name_ll"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="10dp"
+        android:gravity="center_horizontal"
+        android:layout_above="@+id/actions_ll">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Breed Name: "
+            android:fontFamily="casual"
+            android:textSize="@dimen/sp_20"
+            android:textColor="@android:color/black"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"/>
+        <TextView
+            android:id="@+id/name_of_breed_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="casual"
+            android:textSize="@dimen/sp_20"
+            android:textColor="@android:color/black"
+            android:text="Name of the breed"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            android:gravity="center_horizontal"/>
+        </LinearLayout>
+
         <LinearLayout
+            android:id="@+id/actions_ll"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:weightSum="3"
             android:layout_alignParentBottom="true"
             android:padding="10dp"
+            android:layout_marginTop="@dimen/dp_10"
             android:layout_marginBottom="@dimen/dp_5">
             <ImageView
                 android:layout_width="0dp"

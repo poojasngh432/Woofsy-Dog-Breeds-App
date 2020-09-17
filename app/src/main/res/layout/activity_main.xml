@@ -213,7 +213,7 @@
                                     android:layout_marginBottom="4dp"
                                     android:gravity="center"
                                     android:padding="5dp"
-                                    android:text="Shake The Paw"
+                                    android:text="Learn Breed Names"
                                     android:textAllCaps="true"
                                     android:textColor="#454545"
                                     android:textStyle="bold"

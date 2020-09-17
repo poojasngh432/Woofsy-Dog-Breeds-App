@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.example.woofsyapp">
+    package="com.dogbreeds.woofsyapp">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -11,48 +11,48 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@drawable/ic_dog_main"
+        android:icon="@drawable/ic_dog"
         android:label="@string/app_name"
         android:requestLegacyExternalStorage="true"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".activity.AboutActivity"></activity>
+        <activity android:name="com.dogbreeds.woofsyapp.activity.AboutActivity"></activity>
         <activity
-            android:name=".activity.LikesActivity"
+            android:name="com.dogbreeds.woofsyapp.activity.LikesActivity"
             android:label="Breed Name"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.DayNight.DarkActionBar" />
         <activity
-            android:name=".activity.GifActivity"
+            android:name="com.dogbreeds.woofsyapp.activity.GifActivity"
             android:label="Gifs"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.DayNight.DarkActionBar" />
         <activity
-            android:name=".activity.ShakeThePawActivity"
+            android:name="com.dogbreeds.woofsyapp.activity.ShakeThePawActivity"
             android:label="Learn Breed Names"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.DayNight.DarkActionBar" />
         <activity
-            android:name=".activity.GuessTheBreedActivity"
+            android:name="com.dogbreeds.woofsyapp.activity.GuessTheBreedActivity"
             android:label="Guess The Breed"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.DayNight.DarkActionBar" />
         <activity
-            android:name=".activity.DogActivity"
+            android:name="com.dogbreeds.woofsyapp.activity.DogActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.DayNight.DarkActionBar" />
         <activity
-            android:name=".activity.BreedDetailActivity"
+            android:name="com.dogbreeds.woofsyapp.activity.BreedDetailActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.DayNight.DarkActionBar" />
         <activity
-            android:name=".activity.AllBreedsActivity"
+            android:name="com.dogbreeds.woofsyapp.activity.AllBreedsActivity"
             android:label="List Of All Breeds"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.DayNight.DarkActionBar" />
         <activity
-            android:name=".activity.MainActivity"
+            android:name="com.dogbreeds.woofsyapp.activity.MainActivity"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
