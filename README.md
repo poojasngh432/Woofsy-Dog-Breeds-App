@@ -20,13 +20,13 @@ Save your favorites so you can check later.
 Screenshots
 --------------
 
-<p align="center">
+<p align="left">
   <img width="300" height="600" src="https://github.com/poojasngh432/WoofsyApp/blob/master/Screenshots/Screenshot_2020-09-17-22-51-40-130_com.example.woofsyapp.jpg">
   <img width="300" height="600" src="https://github.com/poojasngh432/WoofsyApp/blob/master/Screenshots/Screenshot_2020-09-17-22-51-59-318_com.example.woofsyapp.jpg">
   <img width="300" height="600" src="https://github.com/poojasngh432/WoofsyApp/blob/master/Screenshots/Screenshot_2020-09-17-22-53-07-645_com.example.woofsyapp.jpg">
 </p>
 
-<p align="center">
+<p align="left">
   <img width="300" height="600" src="https://github.com/poojasngh432/WoofsyApp/blob/master/Screenshots/Screenshot_2020-09-17-22-55-13-667_com.example.woofsyapp.jpg">
   <img width="300" height="600" src="https://github.com/poojasngh432/WoofsyApp/blob/master/Screenshots/Screenshot_2020-09-17-22-54-49-687_com.example.woofsyapp.jpg">
   <img width="300" height="600" src="https://github.com/poojasngh432/WoofsyApp/blob/master/Screenshots/Screenshot_2020-09-17-22-53-30-941_com.example.woofsyapp.jpg">
