@@ -17,7 +17,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name="com.dogbreeds.woofsyapp.activity.AboutActivity"></activity>
+        <activity android:name="com.dogbreeds.woofsyapp.activity.AboutActivity" />
         <activity
             android:name="com.dogbreeds.woofsyapp.activity.LikesActivity"
             android:label="Breed Name"
@@ -53,7 +53,8 @@
             android:theme="@style/Theme.AppCompat.DayNight.DarkActionBar" />
         <activity
             android:name="com.dogbreeds.woofsyapp.activity.MainActivity"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
